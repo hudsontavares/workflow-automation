@@ -17,3 +17,26 @@ TBD
 ## Architectural decisions
 
 - **Rush monorepo with pnpm**: TBD (rationale)
+
+### Data model
+
+![Data model](docs/data-model.png)
+
+A user has many workflow configurations, and each configuration has many executions. Every webhook delivery is saved as an event, even when it runs nothing, so we can tell why a workflow didn't fire.
+
+I chose to let the source fan out the events, not the application. Each workflow registers its own webhook and keeps its hook id, so one delivery runs exactly one workflow and a failure in one workflow never affects the others.
+
+An execution points to its event through a unique `eventId`, so an event runs at most one workflow.
+
+## Follow-ups
+
+- Sources that only allow a single subscription (like WhatsApp) would need the application to split each delivery into one job per workflow as soon as it arrives.
+- Dropping the unique `eventId` index would allow one event to have many executions, without changing the schema.
+- Reprocessing: a retry adds an attempt to the existing execution instead of creating a new one, so an event keeps at most one execution.
+
+## Timeline
+
+| Date | Time (EDT) | With AI | Summary |
+| --- | --- | --- | --- |
+| 2026-10-24 | 11:00 | No | Elaborated my base design image describing my understanding of the related entities |
+| 2026-10-24 | 11:10 | Yes | Shared my base design and discussed how to split the problem into entities (user, workflow configuration, execution and event) and how GitHub events reach each workflow. |
