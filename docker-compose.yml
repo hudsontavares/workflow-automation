@@ -1,0 +1,11 @@
+services:
+  mongodb:
+    # Keep in sync with backend/src/testing/test-database.ts
+    image: mongo:8.0
+    ports:
+      - '27117:27017'
+    volumes:
+      - mongodb-data:/data/db
+
+volumes:
+  mongodb-data:

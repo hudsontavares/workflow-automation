@@ -22,6 +22,10 @@
     {
       "packageName": "@workflow-automation/eslint-config",
       "projectFolder": "tools/eslint-config"
+    },
+    {
+      "packageName": "backend",
+      "projectFolder": "backend"
     }
   ]
 }

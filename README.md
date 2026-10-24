@@ -4,7 +4,7 @@
 
 ### Prerequisites
 
-You need Node.js 22.22 or newer; [nvm](https://github.com/nvm-sh/nvm) is the easiest way to install and switch to it, and `nvm use` picks the version from `.nvmrc`. The repository is a [Rush](https://rushjs.io) monorepo, so install Rush globally with `npm install -g @microsoft/rush`. Signing in requires a GitHub OAuth App (setup steps TBD), and whether Docker is needed for local services is TBD.
+You need Node.js 22.22 or newer; [nvm](https://github.com/nvm-sh/nvm) is the easiest way to install and switch to it, and `nvm use` picks the version from `.nvmrc`. The repository is a [Rush](https://rushjs.io) monorepo, so install Rush globally with `npm install -g @microsoft/rush`. Signing in requires a GitHub OAuth App (setup steps TBD). You also need Docker, which runs MongoDB locally and in the backend tests.
 
 ### Installing
 
@@ -12,7 +12,7 @@ From the repository root, run `rush install` to install every project's dependen
 
 ## Execution
 
-TBD
+Copy `.env.example` to `.env` and start MongoDB with `docker compose up -d mongodb`. It listens on port 27117, so it doesn't clash with a MongoDB you may already run on the default port. Then start the API with `rushx start:dev` from `backend/`; `http://localhost:3000/api/health` answers once it can reach the database.
 
 ## Architectural decisions
 
@@ -47,3 +47,4 @@ An execution points to its event through a unique `eventId`, so an event runs at
 | 2026-10-24 | 13:11 | Yes | Discussed the data shape of the workflow execution, including its attempts. |
 | 2026-10-24 | 14:09 – 14:40 | Yes | Agreed the setup of the shared library and built it with the Zod schemas, the app catalog and their tests, then reviewed it. |
 | 2026-10-24 | 14:40 – 14:48 | Yes | Set up ESLint and Prettier with a shared config that enforces my import grouping. |
+| 2026-10-24 | 14:48 – 15:07 | Yes | Built the backend skeleton with NestJS, the MongoDB driver and a health check tested against a real MongoDB, with MongoDB running in Docker on a non-standard port. |
