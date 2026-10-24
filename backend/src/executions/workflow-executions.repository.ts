@@ -34,6 +34,17 @@ export class WorkflowExecutionsRepository implements OnModuleInit {
     }
   }
 
+  listRecentForWorkflow(
+    workflowConfigurationId: string,
+    limit: number,
+  ): Promise<WorkflowExecution[]> {
+    return this.executions
+      .find({ workflowConfigurationId })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .toArray();
+  }
+
   async save(execution: WorkflowExecution): Promise<void> {
     const validExecution = WorkflowExecutionSchema.parse(execution);
     await this.executions.replaceOne({ _id: validExecution._id }, validExecution);

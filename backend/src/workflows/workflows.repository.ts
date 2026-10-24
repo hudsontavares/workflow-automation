@@ -2,12 +2,12 @@ import { Injectable, type OnModuleInit } from '@nestjs/common';
 import { type Collection, Db } from 'mongodb';
 
 import {
-  type LastExecutionSummary,
   type WorkflowConfiguration,
   WorkflowConfigurationSchema,
   type WorkflowExecution,
   type WorkflowListItem,
 } from '@workflow-automation/shared';
+import { summarizeExecution } from '../executions/summarize-execution.js';
 import { workflowExecutionsCollectionName } from '../executions/workflow-executions.repository.js';
 
 @Injectable()
@@ -49,7 +49,7 @@ export class WorkflowsRepository implements OnModuleInit {
 
     return workflows.map(({ latestExecutions, ...workflow }) => ({
       ...workflow,
-      lastExecution: summarizeExecution(latestExecutions[0]),
+      lastExecution: latestExecutions[0] ? summarizeExecution(latestExecutions[0]) : null,
     }));
   }
 
@@ -66,17 +66,4 @@ export class WorkflowsRepository implements OnModuleInit {
     await this.workflows.replaceOne({ _id: validWorkflow._id }, validWorkflow, { upsert: true });
     return validWorkflow;
   }
-}
-
-function summarizeExecution(execution: WorkflowExecution | undefined): LastExecutionSummary | null {
-  if (!execution) {
-    return null;
-  }
-  const lastAttempt = execution.action.attempts.at(-1);
-  return {
-    status: execution.status,
-    ranAt: execution.createdAt,
-    commentUrl: lastAttempt?.output?.commentUrl ?? null,
-    errorMessage: lastAttempt?.error?.message ?? null,
-  };
 }

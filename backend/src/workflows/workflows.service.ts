@@ -3,18 +3,24 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 
 import type {
   CreateWorkflowConfigurationInput,
+  ExecutionSummary,
   UpdateWorkflowConfigurationInput,
   WorkflowConfiguration,
   WorkflowListItem,
 } from '@workflow-automation/shared';
+import { summarizeExecution } from '../executions/summarize-execution.js';
+import { WorkflowExecutionsRepository } from '../executions/workflow-executions.repository.js';
 import { GithubClient } from '../github/github-client.js';
 import { UsersRepository } from '../users/users.repository.js';
 import { WorkflowsRepository } from './workflows.repository.js';
+
+const recentExecutionsLimit = 20;
 
 @Injectable()
 export class WorkflowsService {
   constructor(
     private readonly workflows: WorkflowsRepository,
+    private readonly executions: WorkflowExecutionsRepository,
     private readonly users: UsersRepository,
     private readonly github: GithubClient,
   ) {}
@@ -29,6 +35,16 @@ export class WorkflowsService {
       throw new NotFoundException('Workflow not found');
     }
     return workflow;
+  }
+
+  async listRecentExecutions(userId: string, workflowId: string): Promise<ExecutionSummary[]> {
+    // Answers 404 for a workflow that doesn't belong to the user, before reading its runs.
+    await this.get(userId, workflowId);
+    const executions = await this.executions.listRecentForWorkflow(
+      workflowId,
+      recentExecutionsLimit,
+    );
+    return executions.map(summarizeExecution);
   }
 
   async create(

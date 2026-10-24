@@ -8,10 +8,11 @@ import { SessionStore } from '../core/session.store';
 import { ActionStep } from './action-step';
 import { BuilderStore } from './builder.store';
 import { TriggerStep } from './trigger-step';
+import { WorkflowRuns } from './workflow-runs';
 
 @Component({
   selector: 'app-workflow-builder-page',
-  imports: [ActionStep, RouterLink, TriggerStep],
+  imports: [ActionStep, RouterLink, TriggerStep, WorkflowRuns],
   providers: [BuilderStore],
   template: `
     <h1 class="mb-6 text-2xl font-semibold">
@@ -66,6 +67,12 @@ import { TriggerStep } from './trigger-step';
           </button>
         </div>
       </form>
+
+      @if (workflowId(); as workflowId) {
+        <section class="mt-6 rounded-lg border border-slate-200 bg-white p-5">
+          <app-workflow-runs [workflowId]="workflowId" />
+        </section>
+      }
     }
   `,
 })

@@ -12,6 +12,7 @@ import {
 
 import {
   CreateWorkflowConfigurationInputSchema,
+  type ExecutionSummary,
   UpdateWorkflowConfigurationInputSchema,
   type WorkflowConfiguration,
   type WorkflowListItem,
@@ -36,6 +37,14 @@ export class WorkflowsController {
     @Param('workflowId') workflowId: string,
   ): Promise<WorkflowConfiguration> {
     return this.workflows.get(userId, workflowId);
+  }
+
+  @Get(':workflowId/executions')
+  listRecentExecutions(
+    @CurrentUserId() userId: string,
+    @Param('workflowId') workflowId: string,
+  ): Promise<ExecutionSummary[]> {
+    return this.workflows.listRecentExecutions(userId, workflowId);
   }
 
   @Post()

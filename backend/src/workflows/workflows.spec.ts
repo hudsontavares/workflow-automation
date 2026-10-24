@@ -164,53 +164,53 @@ describe('Workflows API', () => {
     });
   });
 
-  describe('last run', () => {
-    async function recordExecution(
-      workflow: { _id: string; userId: string },
-      status: 'succeeded' | 'failed',
-      createdAt: Date,
-    ) {
-      await app.get(WorkflowExecutionsRepository).insertIfNew({
-        _id: randomUUID(),
-        workflowConfigurationId: workflow._id,
-        eventId: randomUUID(),
-        userId: workflow.userId,
-        status,
-        action: {
-          type: 'github.pull_request.comment',
-          input: {
-            repository: { id: 1, fullName: 'octocat/administered' },
-            pullRequestNumber: 7,
-            body: 'Thanks!',
-          },
-          attempts: [
-            status === 'succeeded'
-              ? {
-                  status,
-                  startedAt: createdAt,
-                  finishedAt: createdAt,
-                  output: {
-                    commentId: 1,
-                    commentUrl: 'https://github.com/octocat/administered/pull/7#issuecomment-1',
-                  },
-                }
-              : {
-                  status,
-                  startedAt: createdAt,
-                  finishedAt: createdAt,
-                  error: { message: 'Forbidden' },
-                },
-          ],
+  async function recordExecution(
+    workflow: { _id: string; userId: string },
+    status: 'succeeded' | 'failed',
+    createdAt: Date,
+  ) {
+    await app.get(WorkflowExecutionsRepository).insertIfNew({
+      _id: randomUUID(),
+      workflowConfigurationId: workflow._id,
+      eventId: randomUUID(),
+      userId: workflow.userId,
+      status,
+      action: {
+        type: 'github.pull_request.comment',
+        input: {
+          repository: { id: 1, fullName: 'octocat/administered' },
+          pullRequestNumber: 7,
+          body: 'Thanks!',
         },
-        createdAt,
-      });
-    }
+        attempts: [
+          status === 'succeeded'
+            ? {
+                status,
+                startedAt: createdAt,
+                finishedAt: createdAt,
+                output: {
+                  commentId: 1,
+                  commentUrl: 'https://github.com/octocat/administered/pull/7#issuecomment-1',
+                },
+              }
+            : {
+                status,
+                startedAt: createdAt,
+                finishedAt: createdAt,
+                error: { message: 'Forbidden' },
+              },
+        ],
+      },
+      createdAt,
+    });
+  }
 
-    async function listedWorkflow(agent: Awaited<ReturnType<typeof signIn>>, workflowId: string) {
-      const list = (await agent.get('/api/workflows')).body;
-      return list.find((item: { _id: string }) => item._id === workflowId);
-    }
+  async function listedWorkflow(agent: Awaited<ReturnType<typeof signIn>>, workflowId: string) {
+    const list = (await agent.get('/api/workflows')).body;
+    return list.find((item: { _id: string }) => item._id === workflowId);
+  }
 
+  describe('last run', () => {
     it('reports no last run for a workflow that never ran', async () => {
       const { agent, workflow } = await createWorkflow();
       expect((await listedWorkflow(agent, workflow._id)).lastExecution).toBeNull();
@@ -221,8 +221,11 @@ describe('Workflows API', () => {
       await recordExecution(workflow, 'failed', new Date('2026-10-24T10:00:00Z'));
       await recordExecution(workflow, 'succeeded', new Date('2026-10-24T11:00:00Z'));
       expect((await listedWorkflow(agent, workflow._id)).lastExecution).toEqual({
+        _id: expect.any(String),
         status: 'succeeded',
         ranAt: '2026-10-24T11:00:00.000Z',
+        repositoryFullName: 'octocat/administered',
+        pullRequestNumber: 7,
         commentUrl: 'https://github.com/octocat/administered/pull/7#issuecomment-1',
         errorMessage: null,
       });
@@ -234,6 +237,22 @@ describe('Workflows API', () => {
       expect((await listedWorkflow(agent, workflow._id)).lastExecution.errorMessage).toBe(
         'Forbidden',
       );
+    });
+  });
+
+  describe('recent runs', () => {
+    it('lists the runs newest first', async () => {
+      const { agent, workflow } = await createWorkflow();
+      await recordExecution(workflow, 'failed', new Date('2026-10-24T10:00:00Z'));
+      await recordExecution(workflow, 'succeeded', new Date('2026-10-24T11:00:00Z'));
+      const runs = (await agent.get(`/api/workflows/${workflow._id}/executions`)).body;
+      expect(runs.map((run: { status: string }) => run.status)).toEqual(['succeeded', 'failed']);
+    });
+
+    it('answers 404 when another user asks for the runs', async () => {
+      const { workflow } = await createWorkflow();
+      const { agent: otherAgent } = await signInAsAnotherUser();
+      await otherAgent.get(`/api/workflows/${workflow._id}/executions`).expect(404);
     });
   });
 

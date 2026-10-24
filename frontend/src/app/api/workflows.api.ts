@@ -4,6 +4,7 @@ import type { Observable } from 'rxjs';
 
 import type {
   CreateWorkflowConfigurationInput,
+  ExecutionSummary,
   Serialized,
   UpdateWorkflowConfigurationInput,
   WorkflowConfiguration,
@@ -20,6 +21,10 @@ export class WorkflowsApi {
 
   get(workflowId: string): Observable<Serialized<WorkflowConfiguration>> {
     return this.http.get<Serialized<WorkflowConfiguration>>(`/api/workflows/${workflowId}`);
+  }
+
+  listRecentExecutions(workflowId: string): Observable<Serialized<ExecutionSummary>[]> {
+    return this.http.get<Serialized<ExecutionSummary>[]>(`/api/workflows/${workflowId}/executions`);
   }
 
   create(input: CreateWorkflowConfigurationInput): Observable<Serialized<WorkflowConfiguration>> {
