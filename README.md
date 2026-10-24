@@ -8,7 +8,13 @@ You need Node.js 22.22 or newer; [nvm](https://github.com/nvm-sh/nvm) is the eas
 
 GitHub has to reach the API to deliver webhooks, so you also need [ngrok](https://ngrok.com); a free account is enough. Install it and add your auth token once with `ngrok config add-authtoken <token>`.
 
-Signing in requires a GitHub OAuth App. Create one under GitHub's Settings → Developer settings → OAuth Apps, with `http://localhost:4200` as the homepage URL and `http://localhost:4200/api/auth/github/callback` as the authorization callback URL. Then generate a client secret and keep it with the client id for the `.env` file. The API builds the callback from the address you open it on, so the callback URL registered on GitHub must use that same address (e.g. `http://localhost:3000/api/auth/github/callback` to try the API on its own).
+Signing in requires a GitHub OAuth App:
+
+1. Open [New OAuth App](https://github.com/settings/applications/new) on GitHub (Settings → Developer settings → OAuth Apps → New OAuth App).
+2. Fill in any application name, `http://localhost:4200` as the homepage URL and `http://localhost:4200/api/auth/github/callback` as the authorization callback URL, and leave device flow off.
+3. Register the application, then generate a client secret. Keep the client id and the secret for the `.env` file; GitHub only shows the secret once.
+
+The API builds the callback from the address you open the app on, so the callback URL registered on GitHub must use that same address.
 
 ### Installing
 
@@ -18,9 +24,9 @@ From the repository root, run `rush install` to install every project's dependen
 
 Start ngrok with `ngrok http 3000` and keep the `https://…` address it prints. Copy `.env.example` to `.env` and fill it in: `PUBLIC_URL` with that ngrok address, the OAuth App's client id and secret, and the three secrets, each a random value of at least 32 characters from a password generator such as [1Password's](https://1password.com/password-generator).
 
-Then start MongoDB with `docker compose up -d mongodb`. It listens on port 27117, so it doesn't clash with a MongoDB you may already run on the default port. Then start the API with `rushx start:dev` from `backend/` and the web app with `rushx start` from `frontend/`, and open `http://localhost:4200`. The web app forwards `/api` to the API, so you sign in on `localhost:4200`, while ngrok only carries GitHub's webhook deliveries to the API.
+Then start MongoDB with `docker compose up -d mongodb`. It listens on port 27117, so it doesn't clash with a MongoDB you may already run on the default port. Then start the API with `rushx start:dev` from `backend/` and the web app with `rushx start` from `frontend/`, and open `http://localhost:4200`. The web app forwards `/api` to the API.
 
-On ngrok's free plan the address changes every time ngrok restarts. When it does, update `PUBLIC_URL`, restart the API, and turn your workflows off and on again, so their webhooks are created with the new address.
+ngrok only matters for webhooks: turning a workflow on registers a webhook on its repository pointing to `PUBLIC_URL`, while the OAuth App stays on `localhost:4200`. On ngrok's free plan the address changes on every restart and existing webhooks keep the old one, so update `PUBLIC_URL`, restart the API, and turn your workflows off and on to re-create them.
 
 ## Architectural decisions
 
