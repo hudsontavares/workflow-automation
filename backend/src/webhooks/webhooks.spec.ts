@@ -65,13 +65,17 @@ describe('POST /api/webhooks/github', () => {
   function deliver(
     hookId: number,
     payload: object = pullRequestPayload(),
-    { deliveryId = randomUUID(), signature }: { deliveryId?: string; signature?: string } = {},
+    {
+      deliveryId = randomUUID(),
+      signature,
+      eventName = 'pull_request',
+    }: { deliveryId?: string; signature?: string; eventName?: string } = {},
   ) {
     const body = JSON.stringify(payload);
     return request(app.getHttpServer())
       .post('/api/webhooks/github')
       .set('Content-Type', 'application/json')
-      .set('X-GitHub-Event', 'pull_request')
+      .set('X-GitHub-Event', eventName)
       .set('X-GitHub-Delivery', deliveryId)
       .set('X-GitHub-Hook-ID', String(hookId))
       .set(
@@ -184,6 +188,14 @@ describe('POST /api/webhooks/github', () => {
       const deliveryId = randomUUID();
       await deliver(hookId, undefined, { deliveryId });
       expect(await ignoredReasonOf(deliveryId)).toBe('workflow_deleted');
+    });
+
+    it('stores a delivery without pull request data with null data', async () => {
+      const { hookId } = await createEnabledWorkflow();
+      const deliveryId = randomUUID();
+      const pingPayload = { repository: { id: 1, full_name: 'octocat/administered' } };
+      await deliver(hookId, pingPayload, { deliveryId, eventName: 'ping' });
+      expect((await findEvent(deliveryId))?.data).toBeNull();
     });
 
     it('ignores deliveries from a hook no workflow owns', async () => {

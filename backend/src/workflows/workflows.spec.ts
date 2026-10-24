@@ -84,7 +84,13 @@ describe('Workflows API', () => {
           .post('/api/workflows')
           .send({ ...input, trigger: { ...input.trigger, hookId: 99 } })
       ).body;
-      expect(workflow.trigger.hookId).toBeUndefined();
+      expect(workflow.trigger.hookId).toBeNull();
+    });
+
+    it('keeps several workflows that never had a webhook', async () => {
+      const { agent, connectionId } = await signInWithConnection();
+      await agent.post('/api/workflows').send(workflowInput(connectionId));
+      await agent.post('/api/workflows').send(workflowInput(connectionId)).expect(201);
     });
 
     it('rejects a template that uses a field the trigger does not output', async () => {

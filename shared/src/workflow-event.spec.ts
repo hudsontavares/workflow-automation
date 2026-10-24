@@ -24,7 +24,7 @@ describe('WorkflowEventSchema', () => {
     const ignored = {
       ...workflowEvent,
       type: 'github.pull_request.closed',
-      data: undefined,
+      data: null,
       status: 'ignored',
       ignoredReason: 'unsupported_type',
     };

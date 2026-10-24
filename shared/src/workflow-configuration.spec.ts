@@ -66,6 +66,12 @@ describe('WorkflowConfigurationSchema', () => {
     ]);
   });
 
+  it('requires the hook id to be present, even when there is no webhook yet', () => {
+    const result = WorkflowConfigurationSchema.safeParse({ ...workflowConfiguration, trigger });
+
+    expect(result.error?.issues[0]?.path).toEqual(['trigger', 'hookId']);
+  });
+
   it('rejects an unsupported trigger type', () => {
     const result = WorkflowConfigurationSchema.safeParse({
       ...workflowConfiguration,

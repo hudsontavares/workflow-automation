@@ -26,7 +26,7 @@ export interface GithubDelivery {
   hookId: number;
   type: string;
   repository: GithubRepository;
-  data?: Record<string, unknown>;
+  data: Record<string, unknown> | null;
 }
 
 export function readGithubDelivery(headers: unknown, payload: unknown): GithubDelivery {
@@ -43,11 +43,13 @@ export function readGithubDelivery(headers: unknown, payload: unknown): GithubDe
       : `github.${eventName}`,
     repository: { id: parsedPayload.repository.id, fullName: parsedPayload.repository.full_name },
     // Keyed by the output fields the app catalog declares for pull request triggers.
-    data: pullRequest && {
-      'pr.number': pullRequest.number,
-      'pr.title': pullRequest.title,
-      'pr.author': pullRequest.user.login,
-      'pr.url': pullRequest.html_url,
-    },
+    data: pullRequest
+      ? {
+          'pr.number': pullRequest.number,
+          'pr.title': pullRequest.title,
+          'pr.author': pullRequest.user.login,
+          'pr.url': pullRequest.html_url,
+        }
+      : null,
   };
 }

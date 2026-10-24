@@ -20,7 +20,8 @@ export class WorkflowsRepository implements OnModuleInit {
       {
         key: { 'trigger.hookId': 1 },
         unique: true,
-        partialFilterExpression: { 'trigger.hookId': { $exists: true } },
+        // Only real hook ids are unique; workflows that never had a webhook all hold null.
+        partialFilterExpression: { 'trigger.hookId': { $type: 'number' } },
       },
     ]);
   }

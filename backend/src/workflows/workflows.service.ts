@@ -41,7 +41,7 @@ export class WorkflowsService {
       userId,
       name: input.name,
       enabled: false,
-      trigger: input.trigger,
+      trigger: { ...input.trigger, hookId: null },
       action: input.action,
       createdAt: now,
       updatedAt: now,
@@ -73,8 +73,7 @@ export class WorkflowsService {
       ...current,
       name: input.name,
       enabled: input.enabled,
-      // Left out rather than undefined: MongoDB would store null, which the unique hookId index counts.
-      trigger: hookId === undefined ? input.trigger : { ...input.trigger, hookId },
+      trigger: { ...input.trigger, hookId },
       action: input.action,
       updatedAt: new Date(),
     });
@@ -114,7 +113,7 @@ export class WorkflowsService {
   }
 
   private async deleteWebhook(userId: string, workflow: WorkflowConfiguration): Promise<void> {
-    if (workflow.trigger.hookId === undefined) {
+    if (workflow.trigger.hookId === null) {
       return;
     }
     const token = await this.requireToken(userId, workflow.trigger.connectionId);

@@ -10,7 +10,7 @@ export const GithubWorkflowEventSchema = z.object({
   // What GitHub sent, e.g. 'github.pull_request.closed', even when no trigger handles it.
   type: z.string().check(z.minLength(1)),
   repository: GithubRepositorySchema,
-  data: z.optional(z.record(z.string(), z.unknown())),
+  data: z.nullable(z.record(z.string(), z.unknown())),
   status: z.enum(['received', 'dispatched', 'ignored']),
   ignoredReason: z.optional(
     z.enum(['unsupported_type', 'unknown_hook', 'workflow_disabled', 'workflow_deleted']),
