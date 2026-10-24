@@ -14,5 +14,10 @@
     "postRushx": []
   },
   "variants": [],
-  "projects": []
+  "projects": [
+    {
+      "packageName": "@workflow-automation/shared",
+      "projectFolder": "shared"
+    }
+  ]
 }

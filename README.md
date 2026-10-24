@@ -4,11 +4,11 @@
 
 ### Prerequisites
 
-You need Node.js 22.22 or newer; [nvm](https://github.com/nvm-sh/nvm) is the easiest way to install and switch to it. The repository is a [Rush](https://rushjs.io) monorepo, so install Rush globally with `npm install -g @microsoft/rush`. Signing in requires a GitHub OAuth App (setup steps TBD), and whether Docker is needed for local services is TBD.
+You need Node.js 22.22 or newer; [nvm](https://github.com/nvm-sh/nvm) is the easiest way to install and switch to it, and `nvm use` picks the version from `.nvmrc`. The repository is a [Rush](https://rushjs.io) monorepo, so install Rush globally with `npm install -g @microsoft/rush`. Signing in requires a GitHub OAuth App (setup steps TBD), and whether Docker is needed for local services is TBD.
 
 ### Installing
 
-From the repository root, run `rush install` to install every project's dependencies from the committed lockfile. Run `rush update` instead after changing a `package.json`, so the lockfile is updated too.
+From the repository root, run `rush install` to install every project's dependencies from the committed lockfile. Run `rush update` instead after changing a `package.json`, so the lockfile is updated too. Then run `rush build` to build every project and `rush test` to run their tests.
 
 ## Execution
 
@@ -25,7 +25,7 @@ TBD
 
 ![Data model](docs/data-model.png)
 
-A user has many workflow configurations, and each configuration has many executions. Every webhook delivery is saved as an event, even when it runs nothing, so we can tell why a workflow didn't fire.
+A user has many workflow configurations, and each configuration has many executions. Every webhook delivery is saved as a workflow event, even when it runs nothing, so we can tell why a workflow didn't fire.
 
 I chose to let the source fan out the events, not the application. Each workflow registers its own webhook and keeps its hook id, so one delivery runs exactly one workflow and a failure in one workflow never affects the others.
 
@@ -45,3 +45,4 @@ An execution points to its event through a unique `eventId`, so an event runs at
 | 2026-10-24 | 11:10 | Yes | Shared my base design and discussed how to split the problem into entities (user, workflow configuration, execution and event) and how GitHub events reach each workflow. |
 | 2026-10-24 | 11:58 | Yes | Discussed the data shape of the workflow configuration, plus the user and event entities. |
 | 2026-10-24 | 13:11 | Yes | Discussed the data shape of the workflow execution, including its attempts. |
+| 2026-10-24 | 14:09 – 14:40 | Yes | Agreed the setup of the shared library and built it with the Zod schemas, the app catalog and their tests, then reviewed it. |
