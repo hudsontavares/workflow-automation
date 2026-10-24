@@ -27,6 +27,9 @@ export class ConnectionsController {
     const repositories = await this.github.listRepositories(accessToken);
     return repositories
       .filter((repository) => repository.isAdmin)
-      .map(({ id, fullName, private: isPrivate }) => ({ id, fullName, private: isPrivate }));
+      .map(({ id, fullName, private: isPrivate }) => ({ id, fullName, private: isPrivate }))
+      .sort((first, second) =>
+        first.fullName.localeCompare(second.fullName, undefined, { sensitivity: 'base' }),
+      );
   }
 }

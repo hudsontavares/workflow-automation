@@ -33,6 +33,22 @@ describe('GET /api/connections/:connectionId/repositories', () => {
     expect(response.body).toEqual([{ id: 1, fullName: 'octocat/administered', private: false }]);
   });
 
+  it('sorts the repositories by full name, ignoring case', async () => {
+    const listedRepositories = githubClient.repositories;
+    githubClient.repositories = [
+      { id: 3, fullName: 'octocat/zeta', private: false, isAdmin: true },
+      { id: 4, fullName: 'Octocat/Alpha', private: false, isAdmin: true },
+      { id: 5, fullName: 'octocat/beta', private: true, isAdmin: true },
+    ];
+    const response = await listRepositoriesOfOwnConnection();
+    githubClient.repositories = listedRepositories;
+    expect(response.body.map((repository: { fullName: string }) => repository.fullName)).toEqual([
+      'Octocat/Alpha',
+      'octocat/beta',
+      'octocat/zeta',
+    ]);
+  });
+
   it("calls GitHub with the connection's decrypted token", async () => {
     await listRepositoriesOfOwnConnection();
     expect(githubClient.tokensUsedToListRepositories.at(-1)).toBe('token-for-repositories');
