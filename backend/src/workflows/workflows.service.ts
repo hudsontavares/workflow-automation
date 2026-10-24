@@ -63,15 +63,17 @@ export class WorkflowsService {
       await this.deleteWebhook(userId, current);
     }
 
-    let hookId = keepsWebhook ? current.trigger.hookId : undefined;
-    if (input.enabled && !keepsWebhook) {
-      hookId = await this.createWebhook(userId, input.trigger);
-    }
+    // A turned-off workflow keeps its last hook id, so late deliveries from that hook still find it.
+    const hookId =
+      input.enabled && !keepsWebhook
+        ? await this.createWebhook(userId, input.trigger)
+        : current.trigger.hookId;
 
     return this.workflows.save({
       ...current,
       name: input.name,
       enabled: input.enabled,
+      // Left out rather than undefined: MongoDB would store null, which the unique hookId index counts.
       trigger: hookId === undefined ? input.trigger : { ...input.trigger, hookId },
       action: input.action,
       updatedAt: new Date(),
@@ -83,14 +85,10 @@ export class WorkflowsService {
     if (current.enabled) {
       await this.deleteWebhook(userId, current);
     }
-    // An absent hookId, not a null one: the unique hookId index only skips missing fields.
-    const triggerWithoutHook = { ...current.trigger };
-    delete triggerWithoutHook.hookId;
     const now = new Date();
     await this.workflows.save({
       ...current,
       enabled: false,
-      trigger: triggerWithoutHook,
       updatedAt: now,
       deletedAt: now,
     });

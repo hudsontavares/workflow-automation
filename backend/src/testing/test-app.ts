@@ -22,7 +22,7 @@ export async function createTestApp(
     .useValue(githubClient)
     .compile();
 
-  const app = moduleRef.createNestApplication<NestExpressApplication>();
+  const app = moduleRef.createNestApplication<NestExpressApplication>({ rawBody: true });
   configureApp(app);
   await app.init();
   return app;

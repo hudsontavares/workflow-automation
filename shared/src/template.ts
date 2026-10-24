@@ -16,3 +16,9 @@ export function findUnknownTemplateFields(template: string, triggerType: Trigger
   const outputFields = findCatalogTrigger(triggerType)?.outputFields ?? [];
   return findTemplateFields(template).filter((field) => !outputFields.includes(field));
 }
+
+export function renderTemplate(template: string, data: Record<string, unknown>): string {
+  return template.replace(templateFieldPattern, (_placeholder, field: string) =>
+    String(data[field] ?? ''),
+  );
+}

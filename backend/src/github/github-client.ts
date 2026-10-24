@@ -26,6 +26,8 @@ const GithubRepositoriesResponseSchema = z.array(
 
 const GithubWebhookResponseSchema = z.object({ id: z.int() });
 
+const GithubCommentResponseSchema = z.object({ id: z.int(), html_url: z.url() });
+
 export interface GithubAccessToken {
   token: string;
   scopes: string[];
@@ -36,6 +38,11 @@ export interface GithubUserProfile {
   login: string;
   name: string | null;
   avatarUrl: string;
+}
+
+export interface GithubComment {
+  id: number;
+  url: string;
 }
 
 export interface GithubUserRepository {
@@ -107,6 +114,22 @@ export class GithubClient {
         acceptNotFound: true,
       },
     );
+  }
+
+  async commentOnIssue(
+    token: string,
+    repositoryFullName: string,
+    issueNumber: number,
+    body: string,
+  ): Promise<GithubComment> {
+    const response = await this.requestApi(
+      'POST',
+      `/repos/${repositoryFullName}/issues/${issueNumber}/comments`,
+      token,
+      { body },
+    );
+    const comment = GithubCommentResponseSchema.parse(await response.json());
+    return { id: comment.id, url: comment.html_url };
   }
 
   private async getFromApi(path: string, token: string): Promise<unknown> {

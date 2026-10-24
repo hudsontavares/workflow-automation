@@ -4,6 +4,7 @@ import {
   findTemplateFields,
   findUnknownTemplateFields,
   hasEmptyTemplatePlaceholder,
+  renderTemplate,
 } from './template.js';
 
 describe('findTemplateFields', () => {
@@ -47,5 +48,20 @@ describe('findUnknownTemplateFields', () => {
         'github.pull_request.opened',
       ),
     ).toEqual([]);
+  });
+});
+
+describe('renderTemplate', () => {
+  it('replaces each field with its value', () => {
+    expect(
+      renderTemplate('Thanks @{{pr.author}} for #{{ pr.number }}', {
+        'pr.author': 'alice',
+        'pr.number': 7,
+      }),
+    ).toBe('Thanks @alice for #7');
+  });
+
+  it('renders a missing field as empty text', () => {
+    expect(renderTemplate('Hi {{pr.author}}!', {})).toBe('Hi !');
   });
 });

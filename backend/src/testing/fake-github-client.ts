@@ -1,5 +1,6 @@
 import type {
   GithubAccessToken,
+  GithubComment,
   GithubClient,
   GithubUserProfile,
   GithubUserRepository,
@@ -12,6 +13,7 @@ export class FakeGithubClient implements Pick<
   | 'listRepositories'
   | 'createPullRequestWebhook'
   | 'deleteWebhook'
+  | 'commentOnIssue'
 > {
   profile: GithubUserProfile = {
     id: 1001,
@@ -33,7 +35,13 @@ export class FakeGithubClient implements Pick<
 
   deletedWebhooks: { repositoryFullName: string; hookId: number }[] = [];
 
+  comments: { repositoryFullName: string; issueNumber: number; body: string }[] = [];
+
+  failCommentsWith: Error | null = null;
+
   private nextHookId = 500;
+
+  private nextCommentId = 900;
 
   async exchangeCodeForToken(code: string, redirectUri: string): Promise<GithubAccessToken> {
     this.redirectUrisUsedToExchangeCodes.push(redirectUri);
@@ -57,5 +65,22 @@ export class FakeGithubClient implements Pick<
 
   async deleteWebhook(_token: string, repositoryFullName: string, hookId: number): Promise<void> {
     this.deletedWebhooks.push({ repositoryFullName, hookId });
+  }
+
+  async commentOnIssue(
+    _token: string,
+    repositoryFullName: string,
+    issueNumber: number,
+    body: string,
+  ): Promise<GithubComment> {
+    if (this.failCommentsWith) {
+      throw this.failCommentsWith;
+    }
+    this.comments.push({ repositoryFullName, issueNumber, body });
+    const id = this.nextCommentId++;
+    return {
+      id,
+      url: `https://github.com/${repositoryFullName}/pull/${issueNumber}#issuecomment-${id}`,
+    };
   }
 }

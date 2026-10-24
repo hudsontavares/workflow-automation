@@ -33,6 +33,10 @@ export class WorkflowsRepository implements OnModuleInit {
     return this.workflows.findOne({ _id: workflowId, userId, deletedAt: null });
   }
 
+  findByHookId(hookId: number): Promise<WorkflowConfiguration | null> {
+    return this.workflows.findOne({ 'trigger.hookId': hookId });
+  }
+
   async save(workflow: WorkflowConfiguration): Promise<WorkflowConfiguration> {
     const validWorkflow = WorkflowConfigurationSchema.parse(workflow);
     await this.workflows.replaceOne({ _id: validWorkflow._id }, validWorkflow, { upsert: true });

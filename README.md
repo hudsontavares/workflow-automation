@@ -53,3 +53,4 @@ An execution points to its event through a unique `eventId`, so an event runs at
 | 2026-10-24 | 15:07 – 15:15 | Yes | Reviewed the tooling and backend skeleton against my review rules and applied the fixes. |
 | 2026-10-24 | 15:15 – 15:35 | Yes | Added GitHub sign-in with an encrypted token and the endpoint listing the repositories I can add webhooks to, with the callback built from the address in use so it works through ngrok. |
 | 2026-10-24 | 15:35 – 15:39 | Yes | Added the workflow API (list, create, edit, turn on/off, delete), creating and removing the GitHub webhook as workflows are turned on and off. |
+| 2026-10-24 | 15:39 – 15:45 | Yes | Added the GitHub webhook endpoint: it verifies the signature, records the event, routes it by hook id and posts the rendered comment on the opened pull request. |

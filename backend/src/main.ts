@@ -5,6 +5,6 @@ import { AppConfig } from './config/app-config.js';
 import { AppModule } from './app.module.js';
 import { configureApp } from './app.setup.js';
 
-const app = await NestFactory.create<NestExpressApplication>(AppModule);
+const app = await NestFactory.create<NestExpressApplication>(AppModule, { rawBody: true });
 configureApp(app);
 await app.listen(app.get(AppConfig).port);

@@ -139,12 +139,12 @@ describe('Workflows API', () => {
       expect(githubClient.deletedWebhooks.at(-1)?.hookId).toBe(workflow.trigger.hookId);
     });
 
-    it('forgets the webhook id when turned off', async () => {
+    it('keeps the last webhook id when turned off, so late deliveries still find it', async () => {
       const { agent, input, workflow } = await createEnabledWorkflow();
       const updated = (
         await agent.put(`/api/workflows/${workflow._id}`).send({ ...input, enabled: false })
       ).body;
-      expect(updated.trigger.hookId).toBeUndefined();
+      expect(updated.trigger.hookId).toBe(workflow.trigger.hookId);
     });
 
     it('moves the webhook when the repository changes while turned on', async () => {
