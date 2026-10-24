@@ -28,6 +28,9 @@ const GithubWebhookResponseSchema = z.object({ id: z.int() });
 
 const GithubCommentResponseSchema = z.object({ id: z.int(), html_url: z.url() });
 
+// 1,000 repositories: enough for any real account, while a huge one can't make the request hang.
+const maxRepositoryPages = 10;
+
 export interface GithubAccessToken {
   token: string;
   scopes: string[];
@@ -78,15 +81,23 @@ export class GithubClient {
   }
 
   async listRepositories(token: string): Promise<GithubUserRepository[]> {
-    const path =
+    const repositories: GithubUserRepository[] = [];
+    let path: string | null =
       '/user/repos?affiliation=owner,collaborator,organization_member&sort=updated&per_page=100';
-    const body = GithubRepositoriesResponseSchema.parse(await this.getFromApi(path, token));
-    return body.map((repository) => ({
-      id: repository.id,
-      fullName: repository.full_name,
-      private: repository.private,
-      isAdmin: repository.permissions.admin,
-    }));
+    for (let page = 1; path && page <= maxRepositoryPages; page++) {
+      const response = await this.requestApi('GET', path, token);
+      const body = GithubRepositoriesResponseSchema.parse(await response.json());
+      repositories.push(
+        ...body.map((repository) => ({
+          id: repository.id,
+          fullName: repository.full_name,
+          private: repository.private,
+          isAdmin: repository.permissions.admin,
+        })),
+      );
+      path = findNextPagePath(response.headers.get('link'));
+    }
+    return repositories;
   }
 
   async createPullRequestWebhook(token: string, repositoryFullName: string): Promise<number> {
@@ -160,4 +171,14 @@ export class GithubClient {
     }
     return response;
   }
+}
+
+// GitHub paginates with a Link header such as `<https://api.github.com/user/repos?page=2>; rel="next"`.
+function findNextPagePath(linkHeader: string | null): string | null {
+  const nextUrl = linkHeader?.match(/<([^>]+)>;\s*rel="next"/)?.[1];
+  if (!nextUrl) {
+    return null;
+  }
+  const url = new URL(nextUrl);
+  return `${url.pathname}${url.search}`;
 }

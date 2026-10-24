@@ -56,3 +56,4 @@ An execution points to its event through a unique `eventId`, so an event runs at
 | 2026-10-24 | Yes | Added the GitHub webhook endpoint: it verifies the signature, records the event, routes it by hook id and posts the rendered comment on the opened pull request. |
 | 2026-10-24 | Yes | Ran the full flow against real GitHub through ngrok: signed in, turned on a workflow, opened a pull request and got the comment. |
 | 2026-10-24 | Yes | Made the event data and the webhook id explicitly nullable in the schemas, after the real run showed missing values being stored as null. |
+| 2026-10-24 | Yes | Made the repository list follow GitHub's pagination, so every repository I can add webhooks to shows up, not only the first 100. |
