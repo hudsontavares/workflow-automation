@@ -1,8 +1,12 @@
 import { z } from 'zod/mini';
 
+const mongodbUriWithDatabasePattern = /^mongodb(\+srv)?:\/\/[^/]+\/[^/?]+/;
+
 const EnvironmentSchema = z.object({
   PORT: z._default(z.coerce.number(), 3000),
-  MONGODB_URI: z.string().check(z.minLength(1)),
+  MONGODB_URI: z
+    .string()
+    .check(z.regex(mongodbUriWithDatabasePattern, 'MONGODB_URI must include a database name')),
 });
 
 export class AppConfig {

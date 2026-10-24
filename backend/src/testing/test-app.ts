@@ -6,10 +6,12 @@ import { configureApp } from '../app.setup.js';
 import { AppConfig } from '../config/app-config.js';
 import type { TestDatabase } from './test-database.js';
 
+const unusedPort = 0;
+
 export async function createTestApp(database: TestDatabase): Promise<INestApplication> {
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
     .overrideProvider(AppConfig)
-    .useValue(new AppConfig(0, database.uri))
+    .useValue(new AppConfig(unusedPort, database.uri))
     .compile();
 
   const app = moduleRef.createNestApplication();

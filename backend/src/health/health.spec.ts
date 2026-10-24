@@ -1,5 +1,6 @@
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { createTestApp } from '../testing/test-app.js';
 import { startTestDatabase, type TestDatabase } from '../testing/test-database.js';

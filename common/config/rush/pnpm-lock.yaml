@@ -19,9 +19,6 @@ importers:
       '@nestjs/platform-express':
         specifier: 12.2.0
         version: 12.2.0(@nestjs/common@12.2.0)(@nestjs/core@12.2.0)
-      '@workflow-automation/shared':
-        specifier: workspace:*
-        version: link:../shared
       mongodb:
         specifier: 7.7.0
         version: 7.7.0
