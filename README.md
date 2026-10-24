@@ -6,6 +6,8 @@
 
 You need Node.js 22.22 or newer; [nvm](https://github.com/nvm-sh/nvm) is the easiest way to install and switch to it, and `nvm use` picks the version from `.nvmrc`. The repository is a [Rush](https://rushjs.io) monorepo, so install Rush globally with `npm install -g @microsoft/rush`. You also need Docker, which runs MongoDB locally and in the backend tests.
 
+GitHub has to reach the API to deliver webhooks, so you also need [ngrok](https://ngrok.com); a free account is enough. Install it and add your auth token once with `ngrok config add-authtoken <token>`.
+
 Signing in requires a GitHub OAuth App. Create one under GitHub's Settings → Developer settings → OAuth Apps, with `http://localhost:4200` as the homepage URL and `http://localhost:4200/api/auth/github/callback` as the authorization callback URL. Then generate a client secret and keep it with the client id for the `.env` file. The API builds the callback from the address you open it on, so the callback URL registered on GitHub must use that same address (e.g. `http://localhost:3000/api/auth/github/callback` to try the API on its own).
 
 ### Installing
@@ -14,7 +16,11 @@ From the repository root, run `rush install` to install every project's dependen
 
 ## Execution
 
-Copy `.env.example` to `.env` and fill it in: the OAuth App's client id and secret, `PUBLIC_URL` with a public address that forwards to the API (e.g. `ngrok http 3000`) so GitHub can deliver webhooks, plus the secrets generated with the `openssl` commands noted in the file. Then start MongoDB with `docker compose up -d mongodb`. It listens on port 27117, so it doesn't clash with a MongoDB you may already run on the default port. Then start the API with `rushx start:dev` from `backend/` and the web app with `rushx start` from `frontend/`, and open `http://localhost:4200`. The web app forwards `/api` to the API, so the OAuth App's callback URL is `http://localhost:4200/api/auth/github/callback`; ngrok only needs to reach the API for GitHub's webhook deliveries.
+Start ngrok with `ngrok http 3000` and keep the `https://…` address it prints. Copy `.env.example` to `.env` and fill it in: `PUBLIC_URL` with that ngrok address, the OAuth App's client id and secret, and the three secrets, each a random value of at least 32 characters from a password generator such as [1Password's](https://1password.com/password-generator).
+
+Then start MongoDB with `docker compose up -d mongodb`. It listens on port 27117, so it doesn't clash with a MongoDB you may already run on the default port. Then start the API with `rushx start:dev` from `backend/` and the web app with `rushx start` from `frontend/`, and open `http://localhost:4200`. The web app forwards `/api` to the API, so you sign in on `localhost:4200`, while ngrok only carries GitHub's webhook deliveries to the API.
+
+On ngrok's free plan the address changes every time ngrok restarts. When it does, update `PUBLIC_URL`, restart the API, and turn your workflows off and on again, so their webhooks are created with the new address.
 
 ## Architectural decisions
 

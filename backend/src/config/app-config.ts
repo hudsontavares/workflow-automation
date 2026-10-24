@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { z } from 'zod/mini';
 
 const mongodbUriWithDatabasePattern = /^mongodb(\+srv)?:\/\/[^/]+\/[^/?]+/;
@@ -15,13 +16,8 @@ const EnvironmentSchema = z.object({
     .check(z.minLength(16, 'GITHUB_WEBHOOK_SECRET must be at least 16 characters')),
   JWT_SECRET: z.string().check(z.minLength(32, 'JWT_SECRET must be at least 32 characters')),
   TOKEN_ENCRYPTION_KEY: z
-    .base64()
-    .check(
-      z.refine(
-        (key) => Buffer.from(key, 'base64').length === 32,
-        'TOKEN_ENCRYPTION_KEY must be 32 bytes encoded as base64',
-      ),
-    ),
+    .string()
+    .check(z.minLength(32, 'TOKEN_ENCRYPTION_KEY must be at least 32 characters')),
 });
 
 export interface AppConfigValues {
@@ -66,7 +62,8 @@ export class AppConfig implements AppConfigValues {
       githubClientSecret: parsed.GITHUB_CLIENT_SECRET,
       githubWebhookSecret: parsed.GITHUB_WEBHOOK_SECRET,
       jwtSecret: parsed.JWT_SECRET,
-      tokenEncryptionKey: Buffer.from(parsed.TOKEN_ENCRYPTION_KEY, 'base64'),
+      // AES-256 needs exactly 32 bytes, so the key is derived from a secret of any length.
+      tokenEncryptionKey: createHash('sha256').update(parsed.TOKEN_ENCRYPTION_KEY).digest(),
     });
   }
 
