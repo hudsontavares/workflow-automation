@@ -41,18 +41,18 @@ An execution points to its event through a unique `eventId`, so an event runs at
 
 ## Timeline
 
-| Date | Time (EDT) | With AI | Summary |
-| --- | --- | --- | --- |
-| 2026-10-24 | 11:00 | No | Elaborated my base design image describing my understanding of the related entities |
-| 2026-10-24 | 11:10 | Yes | Shared my base design and discussed how to split the problem into entities (user, workflow configuration, execution and event) and how GitHub events reach each workflow. |
-| 2026-10-24 | 11:58 | Yes | Discussed the data shape of the workflow configuration, plus the user and event entities. |
-| 2026-10-24 | 13:11 | Yes | Discussed the data shape of the workflow execution, including its attempts. |
-| 2026-10-24 | 14:09 – 14:40 | Yes | Agreed the setup of the shared library and built it with the Zod schemas, the app catalog and their tests, then reviewed it. |
-| 2026-10-24 | 14:40 – 14:48 | Yes | Set up ESLint and Prettier with a shared config that enforces my import grouping. |
-| 2026-10-24 | 14:48 – 15:07 | Yes | Built the backend skeleton with NestJS, the MongoDB driver and a health check tested against a real MongoDB, with MongoDB running in Docker on a non-standard port. |
-| 2026-10-24 | 15:07 – 15:15 | Yes | Reviewed the tooling and backend skeleton against my review rules and applied the fixes. |
-| 2026-10-24 | 15:15 – 15:35 | Yes | Added GitHub sign-in with an encrypted token and the endpoint listing the repositories I can add webhooks to, with the callback built from the address in use so it works through ngrok. |
-| 2026-10-24 | 15:35 – 15:39 | Yes | Added the workflow API (list, create, edit, turn on/off, delete), creating and removing the GitHub webhook as workflows are turned on and off. |
-| 2026-10-24 | 15:39 – 15:45 | Yes | Added the GitHub webhook endpoint: it verifies the signature, records the event, routes it by hook id and posts the rendered comment on the opened pull request. |
-| 2026-10-24 | 15:46 – 16:18 | Yes | Ran the full flow against real GitHub through ngrok: signed in, turned on a workflow, opened a pull request and got the comment. |
-| 2026-10-24 | 16:18 – 16:48 | Yes | Made the event data and the webhook id explicitly nullable in the schemas, after the real run showed missing values being stored as null. |
+| Date | With AI | Summary |
+| --- | --- | --- |
+| 2026-10-24 | No | Elaborated my base design image describing my understanding of the related entities |
+| 2026-10-24 | Yes | Shared my base design and discussed how to split the problem into entities (user, workflow configuration, execution and event) and how GitHub events reach each workflow. |
+| 2026-10-24 | Yes | Discussed the data shape of the workflow configuration, plus the user and event entities. |
+| 2026-10-24 | Yes | Discussed the data shape of the workflow execution, including its attempts. |
+| 2026-10-24 | Yes | Agreed the setup of the shared library and built it with the Zod schemas, the app catalog and their tests, then reviewed it. |
+| 2026-10-24 | Yes | Set up ESLint and Prettier with a shared config that enforces my import grouping. |
+| 2026-10-24 | Yes | Built the backend skeleton with NestJS, the MongoDB driver and a health check tested against a real MongoDB, with MongoDB running in Docker on a non-standard port. |
+| 2026-10-24 | Yes | Reviewed the tooling and backend skeleton against my review rules and applied the fixes. |
+| 2026-10-24 | Yes | Added GitHub sign-in with an encrypted token and the endpoint listing the repositories I can add webhooks to, with the callback built from the address in use so it works through ngrok. |
+| 2026-10-24 | Yes | Added the workflow API (list, create, edit, turn on/off, delete), creating and removing the GitHub webhook as workflows are turned on and off. |
+| 2026-10-24 | Yes | Added the GitHub webhook endpoint: it verifies the signature, records the event, routes it by hook id and posts the rendered comment on the opened pull request. |
+| 2026-10-24 | Yes | Ran the full flow against real GitHub through ngrok: signed in, turned on a workflow, opened a pull request and got the comment. |
+| 2026-10-24 | Yes | Made the event data and the webhook id explicitly nullable in the schemas, after the real run showed missing values being stored as null. |
