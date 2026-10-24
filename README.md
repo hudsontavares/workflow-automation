@@ -44,3 +44,4 @@ An execution points to its event through a unique `eventId`, so an event runs at
 | 2026-10-24 | 11:00 | No | Elaborated my base design image describing my understanding of the related entities |
 | 2026-10-24 | 11:10 | Yes | Shared my base design and discussed how to split the problem into entities (user, workflow configuration, execution and event) and how GitHub events reach each workflow. |
 | 2026-10-24 | 11:58 | Yes | Discussed the data shape of the workflow configuration, plus the user and event entities. |
+| 2026-10-24 | 13:11 | Yes | Discussed the data shape of the workflow execution, including its attempts. |
