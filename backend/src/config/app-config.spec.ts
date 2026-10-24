@@ -4,8 +4,10 @@ import { AppConfig } from './app-config.js';
 
 const environment = {
   MONGODB_URI: 'mongodb://localhost:27117/app',
+  PUBLIC_URL: 'https://example.ngrok-free.dev',
   GITHUB_CLIENT_ID: 'client-id',
   GITHUB_CLIENT_SECRET: 'client-secret',
+  GITHUB_WEBHOOK_SECRET: 'a-webhook-secret',
   JWT_SECRET: 'a-jwt-secret-with-at-least-32-characters',
   TOKEN_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString('base64'),
 };
@@ -21,6 +23,12 @@ describe('AppConfig.fromEnvironment', () => {
 
   it('decodes the token encryption key', () => {
     expect(AppConfig.fromEnvironment(environment).tokenEncryptionKey).toEqual(Buffer.alloc(32, 1));
+  });
+
+  it('builds the GitHub webhook URL from the public URL', () => {
+    expect(AppConfig.fromEnvironment(environment).githubWebhookUrl).toBe(
+      'https://example.ngrok-free.dev/api/webhooks/github',
+    );
   });
 
   it('rejects a database URI without a database name', () => {

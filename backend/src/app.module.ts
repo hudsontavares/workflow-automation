@@ -5,8 +5,16 @@ import { ConfigModule } from './config/config.module.js';
 import { ConnectionsModule } from './connections/connections.module.js';
 import { DatabaseModule } from './database/database.module.js';
 import { HealthModule } from './health/health.module.js';
+import { WorkflowsModule } from './workflows/workflows.module.js';
 
 @Module({
-  imports: [ConfigModule, DatabaseModule, HealthModule, AuthModule, ConnectionsModule],
+  imports: [
+    ConfigModule,
+    DatabaseModule,
+    HealthModule,
+    AuthModule,
+    ConnectionsModule,
+    WorkflowsModule,
+  ],
 })
 export class AppModule {}

@@ -14,7 +14,7 @@ From the repository root, run `rush install` to install every project's dependen
 
 ## Execution
 
-Copy `.env.example` to `.env` and fill it in: the OAuth App's client id and secret, plus a JWT secret and a token encryption key generated with the `openssl` commands noted in the file. Then start MongoDB with `docker compose up -d mongodb`. It listens on port 27117, so it doesn't clash with a MongoDB you may already run on the default port. Then start the API with `rushx start:dev` from `backend/`; `http://localhost:3000/api/health` answers once it can reach the database.
+Copy `.env.example` to `.env` and fill it in: the OAuth App's client id and secret, `PUBLIC_URL` with a public address that forwards to the API (e.g. `ngrok http 3000`) so GitHub can deliver webhooks, plus the secrets generated with the `openssl` commands noted in the file. Then start MongoDB with `docker compose up -d mongodb`. It listens on port 27117, so it doesn't clash with a MongoDB you may already run on the default port. Then start the API with `rushx start:dev` from `backend/`; `http://localhost:3000/api/health` answers once it can reach the database.
 
 ## Architectural decisions
 
@@ -52,3 +52,4 @@ An execution points to its event through a unique `eventId`, so an event runs at
 | 2026-10-24 | 14:48 – 15:07 | Yes | Built the backend skeleton with NestJS, the MongoDB driver and a health check tested against a real MongoDB, with MongoDB running in Docker on a non-standard port. |
 | 2026-10-24 | 15:07 – 15:15 | Yes | Reviewed the tooling and backend skeleton against my review rules and applied the fixes. |
 | 2026-10-24 | 15:15 – 15:35 | Yes | Added GitHub sign-in with an encrypted token and the endpoint listing the repositories I can add webhooks to, with the callback built from the address in use so it works through ngrok. |
+| 2026-10-24 | 15:35 – 15:39 | Yes | Added the workflow API (list, create, edit, turn on/off, delete), creating and removing the GitHub webhook as workflows are turned on and off. |
