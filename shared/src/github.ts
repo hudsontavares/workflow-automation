@@ -6,3 +6,9 @@ export const GithubRepositorySchema = z.object({
 });
 
 export type GithubRepository = z.infer<typeof GithubRepositorySchema>;
+
+export const AccessibleGithubRepositorySchema = z.extend(GithubRepositorySchema, {
+  private: z.boolean(),
+});
+
+export type AccessibleGithubRepository = z.infer<typeof AccessibleGithubRepositorySchema>;

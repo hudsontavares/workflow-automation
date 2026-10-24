@@ -4,7 +4,9 @@
 
 ### Prerequisites
 
-You need Node.js 22.22 or newer; [nvm](https://github.com/nvm-sh/nvm) is the easiest way to install and switch to it, and `nvm use` picks the version from `.nvmrc`. The repository is a [Rush](https://rushjs.io) monorepo, so install Rush globally with `npm install -g @microsoft/rush`. Signing in requires a GitHub OAuth App (setup steps TBD). You also need Docker, which runs MongoDB locally and in the backend tests.
+You need Node.js 22.22 or newer; [nvm](https://github.com/nvm-sh/nvm) is the easiest way to install and switch to it, and `nvm use` picks the version from `.nvmrc`. The repository is a [Rush](https://rushjs.io) monorepo, so install Rush globally with `npm install -g @microsoft/rush`. You also need Docker, which runs MongoDB locally and in the backend tests.
+
+Signing in requires a GitHub OAuth App. Create one under GitHub's Settings → Developer settings → OAuth Apps, with `http://localhost:4200` as the homepage URL and `http://localhost:4200/api/auth/github/callback` as the authorization callback URL. Then generate a client secret and keep it with the client id for the `.env` file. The API builds the callback from the address you open it on, so the callback URL registered on GitHub must use that same address (e.g. `http://localhost:3000/api/auth/github/callback` to try the API on its own).
 
 ### Installing
 
@@ -12,7 +14,7 @@ From the repository root, run `rush install` to install every project's dependen
 
 ## Execution
 
-Copy `.env.example` to `.env` and start MongoDB with `docker compose up -d mongodb`. It listens on port 27117, so it doesn't clash with a MongoDB you may already run on the default port. Then start the API with `rushx start:dev` from `backend/`; `http://localhost:3000/api/health` answers once it can reach the database.
+Copy `.env.example` to `.env` and fill it in: the OAuth App's client id and secret, plus a JWT secret and a token encryption key generated with the `openssl` commands noted in the file. Then start MongoDB with `docker compose up -d mongodb`. It listens on port 27117, so it doesn't clash with a MongoDB you may already run on the default port. Then start the API with `rushx start:dev` from `backend/`; `http://localhost:3000/api/health` answers once it can reach the database.
 
 ## Architectural decisions
 
@@ -49,3 +51,4 @@ An execution points to its event through a unique `eventId`, so an event runs at
 | 2026-10-24 | 14:40 – 14:48 | Yes | Set up ESLint and Prettier with a shared config that enforces my import grouping. |
 | 2026-10-24 | 14:48 – 15:07 | Yes | Built the backend skeleton with NestJS, the MongoDB driver and a health check tested against a real MongoDB, with MongoDB running in Docker on a non-standard port. |
 | 2026-10-24 | 15:07 – 15:15 | Yes | Reviewed the tooling and backend skeleton against my review rules and applied the fixes. |
+| 2026-10-24 | 15:15 – 15:35 | Yes | Added GitHub sign-in with an encrypted token and the endpoint listing the repositories I can add webhooks to, with the callback built from the address in use so it works through ngrok. |

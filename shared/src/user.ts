@@ -21,5 +21,16 @@ export const UserSchema = z.object({
   createdAt: z.date(),
 });
 
+export const ConnectionSummarySchema = z.discriminatedUnion('app', [
+  z.pick(GithubConnectionSchema, { _id: true, app: true, account: true }),
+]);
+
+export const UserProfileSchema = z.extend(
+  z.pick(UserSchema, { _id: true, name: true, avatarUrl: true }),
+  { connections: z.array(ConnectionSummarySchema) },
+);
+
 export type Connection = z.infer<typeof ConnectionSchema>;
+export type ConnectionSummary = z.infer<typeof ConnectionSummarySchema>;
 export type User = z.infer<typeof UserSchema>;
+export type UserProfile = z.infer<typeof UserProfileSchema>;
