@@ -5,6 +5,7 @@ import type {
   CreateWorkflowConfigurationInput,
   UpdateWorkflowConfigurationInput,
   WorkflowConfiguration,
+  WorkflowListItem,
 } from '@workflow-automation/shared';
 import { GithubClient } from '../github/github-client.js';
 import { UsersRepository } from '../users/users.repository.js';
@@ -18,7 +19,7 @@ export class WorkflowsService {
     private readonly github: GithubClient,
   ) {}
 
-  list(userId: string): Promise<WorkflowConfiguration[]> {
+  list(userId: string): Promise<WorkflowListItem[]> {
     return this.workflows.listForUser(userId);
   }
 

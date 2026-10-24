@@ -14,6 +14,7 @@ import {
   CreateWorkflowConfigurationInputSchema,
   UpdateWorkflowConfigurationInputSchema,
   type WorkflowConfiguration,
+  type WorkflowListItem,
 } from '@workflow-automation/shared';
 import { CurrentUserId, SessionGuard } from '../auth/session.guard.js';
 import { parseRequestBody } from '../validation/parse-request-body.js';
@@ -25,7 +26,7 @@ export class WorkflowsController {
   constructor(private readonly workflows: WorkflowsService) {}
 
   @Get()
-  list(@CurrentUserId() userId: string): Promise<WorkflowConfiguration[]> {
+  list(@CurrentUserId() userId: string): Promise<WorkflowListItem[]> {
     return this.workflows.list(userId);
   }
 

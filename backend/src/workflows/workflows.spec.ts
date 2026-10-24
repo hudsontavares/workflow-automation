@@ -1,7 +1,9 @@
+import { randomUUID } from 'node:crypto';
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
+import { WorkflowExecutionsRepository } from '../executions/workflow-executions.repository.js';
 import { FakeGithubClient } from '../testing/fake-github-client.js';
 import { createTestApp, signIn } from '../testing/test-app.js';
 import { startTestDatabase, type TestDatabase } from '../testing/test-database.js';
@@ -159,6 +161,79 @@ describe('Workflows API', () => {
         .put(`/api/workflows/${workflow._id}`)
         .send({ ...workflowInput(connectionId, 'octocat/another'), enabled: true });
       expect(githubClient.createdWebhooks.at(-1)?.repositoryFullName).toBe('octocat/another');
+    });
+  });
+
+  describe('last run', () => {
+    async function recordExecution(
+      workflow: { _id: string; userId: string },
+      status: 'succeeded' | 'failed',
+      createdAt: Date,
+    ) {
+      await app.get(WorkflowExecutionsRepository).insertIfNew({
+        _id: randomUUID(),
+        workflowConfigurationId: workflow._id,
+        eventId: randomUUID(),
+        userId: workflow.userId,
+        status,
+        action: {
+          type: 'github.pull_request.comment',
+          input: {
+            repository: { id: 1, fullName: 'octocat/administered' },
+            pullRequestNumber: 7,
+            body: 'Thanks!',
+          },
+          attempts: [
+            status === 'succeeded'
+              ? {
+                  status,
+                  startedAt: createdAt,
+                  finishedAt: createdAt,
+                  output: {
+                    commentId: 1,
+                    commentUrl: 'https://github.com/octocat/administered/pull/7#issuecomment-1',
+                  },
+                }
+              : {
+                  status,
+                  startedAt: createdAt,
+                  finishedAt: createdAt,
+                  error: { message: 'Forbidden' },
+                },
+          ],
+        },
+        createdAt,
+      });
+    }
+
+    async function listedWorkflow(agent: Awaited<ReturnType<typeof signIn>>, workflowId: string) {
+      const list = (await agent.get('/api/workflows')).body;
+      return list.find((item: { _id: string }) => item._id === workflowId);
+    }
+
+    it('reports no last run for a workflow that never ran', async () => {
+      const { agent, workflow } = await createWorkflow();
+      expect((await listedWorkflow(agent, workflow._id)).lastExecution).toBeNull();
+    });
+
+    it('summarizes the most recent run', async () => {
+      const { agent, workflow } = await createWorkflow();
+      await recordExecution(workflow, 'failed', new Date('2026-10-24T10:00:00Z'));
+      await recordExecution(workflow, 'succeeded', new Date('2026-10-24T11:00:00Z'));
+      expect((await listedWorkflow(agent, workflow._id)).lastExecution).toEqual({
+        status: 'succeeded',
+        ranAt: '2026-10-24T11:00:00.000Z',
+        commentUrl: 'https://github.com/octocat/administered/pull/7#issuecomment-1',
+        errorMessage: null,
+      });
+    });
+
+    it('includes the error of a failed run', async () => {
+      const { agent, workflow } = await createWorkflow();
+      await recordExecution(workflow, 'failed', new Date());
+      expect((await listedWorkflow(agent, workflow._id)).lastExecution.errorMessage).toBe(
+        'Forbidden',
+      );
     });
   });
 

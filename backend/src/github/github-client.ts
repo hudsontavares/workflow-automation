@@ -102,29 +102,25 @@ export class GithubClient {
 
   async createPullRequestWebhook(token: string, repositoryFullName: string): Promise<number> {
     const response = await this.requestApi('POST', `/repos/${repositoryFullName}/hooks`, token, {
-      name: 'web',
-      active: true,
-      events: ['pull_request'],
-      config: {
-        url: this.config.githubWebhookUrl,
-        content_type: 'json',
-        secret: this.config.githubWebhookSecret,
+      body: {
+        name: 'web',
+        active: true,
+        events: ['pull_request'],
+        config: {
+          url: this.config.githubWebhookUrl,
+          content_type: 'json',
+          secret: this.config.githubWebhookSecret,
+        },
       },
     });
     return GithubWebhookResponseSchema.parse(await response.json()).id;
   }
 
   async deleteWebhook(token: string, repositoryFullName: string, hookId: number): Promise<void> {
-    await this.requestApi(
-      'DELETE',
-      `/repos/${repositoryFullName}/hooks/${hookId}`,
-      token,
-      undefined,
-      {
-        // The hook may already be gone, e.g. removed by hand on GitHub.
-        acceptNotFound: true,
-      },
-    );
+    await this.requestApi('DELETE', `/repos/${repositoryFullName}/hooks/${hookId}`, token, {
+      // The hook may already be gone, e.g. removed by hand on GitHub.
+      acceptNotFound: true,
+    });
   }
 
   async commentOnIssue(
@@ -137,7 +133,7 @@ export class GithubClient {
       'POST',
       `/repos/${repositoryFullName}/issues/${issueNumber}/comments`,
       token,
-      { body },
+      { body: { body } },
     );
     const comment = GithubCommentResponseSchema.parse(await response.json());
     return { id: comment.id, url: comment.html_url };
@@ -152,8 +148,7 @@ export class GithubClient {
     method: string,
     path: string,
     token: string,
-    body?: unknown,
-    { acceptNotFound = false } = {},
+    { body, acceptNotFound = false }: { body?: unknown; acceptNotFound?: boolean } = {},
   ): Promise<Response> {
     const response = await fetch(`https://api.github.com${path}`, {
       method,

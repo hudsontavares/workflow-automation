@@ -4,12 +4,14 @@ import { type Collection, Db } from 'mongodb';
 import { type WorkflowExecution, WorkflowExecutionSchema } from '@workflow-automation/shared';
 import { isDuplicateKeyError } from '../database/is-duplicate-key-error.js';
 
+export const workflowExecutionsCollectionName = 'workflowExecutions';
+
 @Injectable()
 export class WorkflowExecutionsRepository implements OnModuleInit {
   private readonly executions: Collection<WorkflowExecution>;
 
   constructor(db: Db) {
-    this.executions = db.collection<WorkflowExecution>('workflowExecutions');
+    this.executions = db.collection<WorkflowExecution>(workflowExecutionsCollectionName);
   }
 
   async onModuleInit() {

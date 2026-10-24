@@ -66,13 +66,22 @@ describe('GitHub sign-in', () => {
   });
 
   describe('GET /api/auth/github/callback', () => {
-    it('rejects a state that does not match the cookie', async () => {
+    it('sends the user back to sign-in when the state does not match the cookie', async () => {
       const agent = request.agent(app.getHttpServer());
-      await agent.get('/api/auth/github');
-      await agent
+      await agent.get('/api/auth/github').set('Host', 'localhost:4200');
+      const response = await agent
         .get('/api/auth/github/callback')
-        .query({ code: 'code', state: 'forged' })
-        .expect(400);
+        .set('Host', 'localhost:4200')
+        .query({ code: 'code', state: 'forged' });
+      expect(response.headers.location).toBe('http://localhost:4200/sign-in?error=invalid_state');
+    });
+
+    it('sends the user back to sign-in when they cancel on GitHub', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api/auth/github/callback')
+        .set('Host', 'localhost:4200')
+        .query({ error: 'access_denied', state: 'any' });
+      expect(response.headers.location).toBe('http://localhost:4200/sign-in?error=access_denied');
     });
 
     async function signInThrough(host: string) {

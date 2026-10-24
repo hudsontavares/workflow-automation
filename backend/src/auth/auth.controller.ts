@@ -1,6 +1,5 @@
 import { randomBytes } from 'node:crypto';
 import {
-  BadRequestException,
   Controller,
   Get,
   HttpCode,
@@ -38,6 +37,10 @@ function githubCallbackUrl(request: Request): string {
   return `${requestOrigin(request)}/api/auth/github/callback`;
 }
 
+function signInPageUrl(request: Request, error: 'access_denied' | 'invalid_state'): string {
+  return `${requestOrigin(request)}/sign-in?error=${error}`;
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -68,13 +71,20 @@ export class AuthController {
   async finishGithubSignIn(
     @Query('code') code: string | undefined,
     @Query('state') state: string | undefined,
+    @Query('error') githubError: string | undefined,
     @Req() request: Request,
     @Res() response: Response,
   ): Promise<void> {
     const expectedState: string | undefined = request.cookies[signInStateCookieName];
     response.clearCookie(signInStateCookieName, { path: '/' });
+    // GitHub sends ?error=access_denied when the user cancels on its authorization page.
+    if (githubError) {
+      response.redirect(signInPageUrl(request, 'access_denied'));
+      return;
+    }
     if (!code || !state || state !== expectedState) {
-      throw new BadRequestException('Invalid GitHub sign-in state');
+      response.redirect(signInPageUrl(request, 'invalid_state'));
+      return;
     }
 
     const accessToken = await this.github.exchangeCodeForToken(code, githubCallbackUrl(request));

@@ -26,6 +26,10 @@
     {
       "packageName": "backend",
       "projectFolder": "backend"
+    },
+    {
+      "packageName": "frontend",
+      "projectFolder": "frontend"
     }
   ]
 }

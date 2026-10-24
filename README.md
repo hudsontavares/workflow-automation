@@ -14,7 +14,7 @@ From the repository root, run `rush install` to install every project's dependen
 
 ## Execution
 
-Copy `.env.example` to `.env` and fill it in: the OAuth App's client id and secret, `PUBLIC_URL` with a public address that forwards to the API (e.g. `ngrok http 3000`) so GitHub can deliver webhooks, plus the secrets generated with the `openssl` commands noted in the file. Then start MongoDB with `docker compose up -d mongodb`. It listens on port 27117, so it doesn't clash with a MongoDB you may already run on the default port. Then start the API with `rushx start:dev` from `backend/`; `http://localhost:3000/api/health` answers once it can reach the database.
+Copy `.env.example` to `.env` and fill it in: the OAuth App's client id and secret, `PUBLIC_URL` with a public address that forwards to the API (e.g. `ngrok http 3000`) so GitHub can deliver webhooks, plus the secrets generated with the `openssl` commands noted in the file. Then start MongoDB with `docker compose up -d mongodb`. It listens on port 27117, so it doesn't clash with a MongoDB you may already run on the default port. Then start the API with `rushx start:dev` from `backend/` and the web app with `rushx start` from `frontend/`, and open `http://localhost:4200`. The web app forwards `/api` to the API, so the OAuth App's callback URL is `http://localhost:4200/api/auth/github/callback`; ngrok only needs to reach the API for GitHub's webhook deliveries.
 
 ## Architectural decisions
 
