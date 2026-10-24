@@ -3,3 +3,8 @@
 body {
   @apply bg-slate-50 text-slate-900;
 }
+
+/* Tailwind 4 gives buttons the default arrow cursor; clickable ones get the hand back. */
+button:not(:disabled) {
+  cursor: pointer;
+}
