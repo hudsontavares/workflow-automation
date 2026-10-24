@@ -8,7 +8,7 @@ You need Node.js 22.22 or newer; [nvm](https://github.com/nvm-sh/nvm) is the eas
 
 ### Installing
 
-From the repository root, run `rush install` to install every project's dependencies from the committed lockfile. Run `rush update` instead after changing a `package.json`, so the lockfile is updated too. Then run `rush build` to build every project and `rush test` to run their tests.
+From the repository root, run `rush install` to install every project's dependencies from the committed lockfile. Run `rush update` instead after changing a `package.json`, so the lockfile is updated too. Then run `rush build` to build every project and `rush test` to run their tests. `rush lint` and `rush check-format` check the code style, and `rush lint --fix` and `rush format` fix it.
 
 ## Execution
 
@@ -46,3 +46,4 @@ An execution points to its event through a unique `eventId`, so an event runs at
 | 2026-10-24 | 11:58 | Yes | Discussed the data shape of the workflow configuration, plus the user and event entities. |
 | 2026-10-24 | 13:11 | Yes | Discussed the data shape of the workflow execution, including its attempts. |
 | 2026-10-24 | 14:09 – 14:40 | Yes | Agreed the setup of the shared library and built it with the Zod schemas, the app catalog and their tests, then reviewed it. |
+| 2026-10-24 | 14:40 – 14:48 | Yes | Set up ESLint and Prettier with a shared config that enforces my import grouping. |

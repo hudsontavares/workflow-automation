@@ -3,12 +3,43 @@
   "commands": [
     {
       "commandKind": "bulk",
+      "name": "lint",
+      "summary": "Lints every project",
+      "description": "Runs the \"lint\" script of every project that has one.",
+      "enableParallelism": true,
+      "ignoreMissingScript": true
+    },
+    {
+      "commandKind": "bulk",
       "name": "test",
       "summary": "Runs the tests of every project",
       "description": "Runs the \"test\" script of every project that has one, in dependency order.",
       "enableParallelism": true,
       "ignoreMissingScript": true
+    },
+    {
+      "commandKind": "global",
+      "name": "format",
+      "summary": "Formats every file with Prettier",
+      "autoinstallerName": "rush-prettier",
+      "shellCommand": "prettier --write ."
+    },
+    {
+      "commandKind": "global",
+      "name": "check-format",
+      "summary": "Checks that every file is formatted with Prettier",
+      "autoinstallerName": "rush-prettier",
+      "shellCommand": "prettier --check ."
     }
   ],
-  "parameters": []
+  "parameters": [
+    {
+      "parameterKind": "flag",
+      "longName": "--fix",
+      "description": "Fixes the problems ESLint can fix automatically",
+      "associatedCommands": [
+        "lint"
+      ]
+    }
+  ]
 }

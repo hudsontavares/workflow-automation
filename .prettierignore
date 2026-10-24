@@ -1,0 +1,5 @@
+common/
+docs/
+*.md
+**/dist/
+**/node_modules/

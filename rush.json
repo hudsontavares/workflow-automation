@@ -18,6 +18,10 @@
     {
       "packageName": "@workflow-automation/shared",
       "projectFolder": "shared"
+    },
+    {
+      "packageName": "@workflow-automation/eslint-config",
+      "projectFolder": "tools/eslint-config"
     }
   ]
 }
