@@ -26,6 +26,8 @@ Start ngrok with `ngrok http 3000` and keep the `https://…` address it prints.
 
 Then start MongoDB with `docker compose up -d mongodb`. It listens on port 27117, so it doesn't clash with a MongoDB you may already run on the default port. Then start the API with `rushx start:dev` from `backend/` and the web app with `rushx start` from `frontend/`, and open `http://localhost:4200`. The web app forwards `/api` to the API.
 
+![Architecture](docs/architecture.png)
+
 ngrok only matters for webhooks: turning a workflow on registers a webhook on its repository pointing to `PUBLIC_URL`, while the OAuth App stays on `localhost:4200`. On ngrok's free plan the address changes on every restart and existing webhooks keep the old one, so update `PUBLIC_URL`, restart the API, and turn your workflows off and on to re-create them.
 
 ## Architectural decisions
