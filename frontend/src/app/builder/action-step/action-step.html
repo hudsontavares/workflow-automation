@@ -1,0 +1,25 @@
+<h2 class="mb-3 font-semibold">2. Do this</h2>
+<app-app-picker
+  label="Action app"
+  [selectedAppId]="store.actionAppId()"
+  (selected)="store.actionAppId.set($event)"
+/>
+
+<fieldset class="mt-4">
+  <legend class="mb-1 text-sm font-medium">Action</legend>
+  @for (action of actions(); track action.type) {
+    <label class="flex items-center gap-2 text-sm">
+      <input
+        type="radio"
+        name="action"
+        [checked]="action.type === store.actionType()"
+        (change)="store.actionType.set(action.type)"
+      />
+      {{ action.label }}
+    </label>
+  }
+</fieldset>
+
+<div class="mt-4">
+  <app-template-editor />
+</div>

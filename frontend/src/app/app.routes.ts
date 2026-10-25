@@ -1,9 +1,9 @@
 import type { Routes } from '@angular/router';
 
-import { WorkflowBuilderPage } from './builder/workflow-builder.page';
+import { WorkflowBuilderPage } from './builder/workflow-builder-page/workflow-builder.page';
 import { signedInGuard } from './core/signed-in.guard';
-import { SignInPage } from './sign-in/sign-in.page';
-import { WorkflowListPage } from './workflows/workflow-list.page';
+import { SignInPage } from './sign-in/sign-in-page/sign-in.page';
+import { WorkflowListPage } from './workflows/workflow-list-page/workflow-list.page';
 
 export const routes: Routes = [
   { path: 'sign-in', component: SignInPage },

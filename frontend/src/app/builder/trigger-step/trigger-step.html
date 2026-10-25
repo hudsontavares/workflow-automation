@@ -1,0 +1,42 @@
+<h2 class="mb-3 font-semibold">1. When this happens</h2>
+<app-app-picker
+  label="Trigger app"
+  [selectedAppId]="store.triggerAppId()"
+  (selected)="store.triggerAppId.set($event)"
+/>
+
+<fieldset class="mt-4">
+  <legend class="mb-1 text-sm font-medium">Event</legend>
+  @for (trigger of triggers(); track trigger.type) {
+    <label class="flex items-center gap-2 text-sm">
+      <input
+        type="radio"
+        name="trigger"
+        [checked]="trigger.type === store.triggerType()"
+        (change)="store.triggerType.set(trigger.type)"
+      />
+      {{ trigger.label }}
+    </label>
+  }
+</fieldset>
+
+<label for="repository" class="mb-1 mt-4 block text-sm font-medium">Repository</label>
+@if (repositories.isLoading()) {
+  <p class="text-sm text-slate-600">Loading your repositories…</p>
+} @else if (repositories.error()) {
+  <p role="alert" class="text-sm text-rose-700">Your repositories could not be loaded.</p>
+} @else {
+  <select
+    #repositoryField
+    id="repository"
+    class="w-full rounded-md border border-slate-300 p-2 text-sm"
+    (change)="selectRepository(repositoryField.value)"
+  >
+    <option value="" [selected]="!store.repository()">Choose a repository you administer</option>
+    @for (repository of repositoryOptions(); track repository.id) {
+      <option [value]="repository.id" [selected]="repository.id === store.repository()?.id">
+        {{ repository.fullName }}
+      </option>
+    }
+  </select>
+}

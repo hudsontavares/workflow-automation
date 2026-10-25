@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { BuilderStore } from './builder.store';
+import { BuilderStore } from '../builder.store';
 import { TemplateEditor } from './template-editor';
 
 describe('TemplateEditor', () => {
