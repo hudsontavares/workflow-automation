@@ -12,6 +12,10 @@ on:
         type: string
         default: ''
 
+env:
+  # Where Rush keeps the Rush and pnpm versions it downloads; inside common/temp, so it is cached.
+  RUSH_GLOBAL_FOLDER: ${{ vars.RUSH_GLOBAL_FOLDER }}
+
 jobs:
   step-rush:
     runs-on: ubuntu-24.04
@@ -54,4 +58,4 @@ jobs:
       - name: keep only the reusable parts of the cache
         if: always()
         run: |
-          rm -rf $(find common/temp/* -maxdepth 1 | grep -v pnpm-store | grep -v install-run)
+          rm -rf $(find common/temp/* -maxdepth 1 | grep -v pnpm-store | grep -v install-run | grep -vE "^$RUSH_GLOBAL_FOLDER(/|$)")
