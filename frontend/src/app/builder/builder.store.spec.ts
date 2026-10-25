@@ -71,4 +71,30 @@ describe('BuilderStore', () => {
     store.enabled.set(true);
     expect(store.toUpdateInput().enabled).toBe(true);
   });
+
+  describe('loading a Copilot draft', () => {
+    function storeWithDraft(): BuilderStore {
+      const store = new BuilderStore();
+      store.loadDraft({
+        name: 'Thank PR authors',
+        triggerType: 'github.pull_request.opened',
+        actionType: 'github.pull_request.comment',
+        repository: { id: 1, fullName: 'octocat/hello-world' },
+        body: 'Thanks @{{pr.author}}!',
+      });
+      return store;
+    }
+
+    it('takes the drafted name', () => {
+      expect(storeWithDraft().name()).toBe('Thank PR authors');
+    });
+
+    it('takes the drafted repository', () => {
+      expect(storeWithDraft().repository()).toEqual({ id: 1, fullName: 'octocat/hello-world' });
+    });
+
+    it('takes the drafted comment template', () => {
+      expect(storeWithDraft().body()).toBe('Thanks @{{pr.author}}!');
+    });
+  });
 });

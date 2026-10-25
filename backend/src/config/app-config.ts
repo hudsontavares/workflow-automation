@@ -15,6 +15,8 @@ const EnvironmentSchema = z.object({
     .string()
     .check(z.minLength(16, 'GITHUB_WEBHOOK_SECRET must be at least 16 characters')),
   JWT_SECRET: z.string().check(z.minLength(32, 'JWT_SECRET must be at least 32 characters')),
+  // Optional: without it the Copilot answers that it is not configured.
+  ANTHROPIC_API_KEY: z.optional(z.string()),
   TOKEN_ENCRYPTION_KEY: z
     .string()
     .check(z.minLength(32, 'TOKEN_ENCRYPTION_KEY must be at least 32 characters')),
@@ -29,6 +31,7 @@ export interface AppConfigValues {
   githubWebhookSecret: string;
   jwtSecret: string;
   tokenEncryptionKey: Buffer;
+  anthropicApiKey: string | null;
 }
 
 export class AppConfig implements AppConfigValues {
@@ -40,6 +43,7 @@ export class AppConfig implements AppConfigValues {
   readonly githubWebhookSecret: string;
   readonly jwtSecret: string;
   readonly tokenEncryptionKey: Buffer;
+  readonly anthropicApiKey: string | null;
 
   constructor(values: AppConfigValues) {
     this.port = values.port;
@@ -50,6 +54,7 @@ export class AppConfig implements AppConfigValues {
     this.githubWebhookSecret = values.githubWebhookSecret;
     this.jwtSecret = values.jwtSecret;
     this.tokenEncryptionKey = values.tokenEncryptionKey;
+    this.anthropicApiKey = values.anthropicApiKey;
   }
 
   static fromEnvironment(environment: NodeJS.ProcessEnv): AppConfig {
@@ -64,6 +69,8 @@ export class AppConfig implements AppConfigValues {
       jwtSecret: parsed.JWT_SECRET,
       // AES-256 needs exactly 32 bytes, so the key is derived from a secret of any length.
       tokenEncryptionKey: createHash('sha256').update(parsed.TOKEN_ENCRYPTION_KEY).digest(),
+      // An empty value, as copied from .env.example, also means not configured.
+      anthropicApiKey: parsed.ANTHROPIC_API_KEY || null,
     });
   }
 

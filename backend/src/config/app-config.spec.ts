@@ -31,6 +31,16 @@ describe('AppConfig.fromEnvironment', () => {
     );
   });
 
+  it('leaves the Copilot unconfigured without an Anthropic API key', () => {
+    expect(AppConfig.fromEnvironment(environment).anthropicApiKey).toBeNull();
+  });
+
+  it('leaves the Copilot unconfigured with an empty Anthropic API key', () => {
+    expect(
+      AppConfig.fromEnvironment({ ...environment, ANTHROPIC_API_KEY: '' }).anthropicApiKey,
+    ).toBeNull();
+  });
+
   it('rejects a database URI without a database name', () => {
     expect(() =>
       AppConfig.fromEnvironment({ ...environment, MONGODB_URI: 'mongodb://localhost:27117' }),

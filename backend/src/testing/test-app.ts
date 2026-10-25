@@ -6,20 +6,27 @@ import request from 'supertest';
 import { AppModule } from '../app.module.js';
 import { configureApp } from '../app.setup.js';
 import { AppConfig } from '../config/app-config.js';
+import { CopilotClient } from '../copilot/copilot-client.js';
 import { GithubClient } from '../github/github-client.js';
+import { FakeCopilotClient } from './fake-copilot-client.js';
 import { FakeGithubClient } from './fake-github-client.js';
 import { createTestConfig } from './test-config.js';
 import type { TestDatabase } from './test-database.js';
 
 export async function createTestApp(
   database: TestDatabase,
-  githubClient = new FakeGithubClient(),
+  {
+    githubClient = new FakeGithubClient(),
+    copilotClient = new FakeCopilotClient(),
+  }: { githubClient?: FakeGithubClient; copilotClient?: FakeCopilotClient } = {},
 ): Promise<INestApplication> {
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
     .overrideProvider(AppConfig)
     .useValue(createTestConfig(database.uri))
     .overrideProvider(GithubClient)
     .useValue(githubClient)
+    .overrideProvider(CopilotClient)
+    .useValue(copilotClient)
     .compile();
 
   const app = moduleRef.createNestApplication<NestExpressApplication>({ rawBody: true });

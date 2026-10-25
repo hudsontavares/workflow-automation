@@ -5,13 +5,14 @@ import { firstValueFrom } from 'rxjs';
 
 import type { Serialized, WorkflowListItem } from '@workflow-automation/shared';
 import { apiErrorMessage } from '../api/api-error-message';
+import { CopilotBox } from '../copilot/copilot-box';
 import { WorkflowsApi } from '../api/workflows.api';
 import { toUpdateInput } from './workflow-input';
 import { WorkflowRow } from './workflow-row';
 
 @Component({
   selector: 'app-workflow-list-page',
-  imports: [RouterLink, WorkflowRow],
+  imports: [CopilotBox, RouterLink, WorkflowRow],
   template: `
     <div class="mb-6 flex items-center justify-between">
       <h1 class="text-2xl font-semibold">Workflows</h1>
@@ -21,6 +22,10 @@ import { WorkflowRow } from './workflow-row';
       >
         New workflow
       </a>
+    </div>
+
+    <div class="mb-6">
+      <app-copilot-box />
     </div>
 
     @if (actionError()) {

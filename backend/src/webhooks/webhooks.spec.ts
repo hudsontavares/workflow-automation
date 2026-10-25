@@ -18,7 +18,7 @@ describe('POST /api/webhooks/github', () => {
 
   beforeAll(async () => {
     database = await startTestDatabase();
-    app = await createTestApp(database, githubClient);
+    app = await createTestApp(database, { githubClient });
   });
 
   afterEach(() => {

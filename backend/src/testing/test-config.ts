@@ -14,5 +14,6 @@ export function createTestConfig(mongodbUri: string): AppConfig {
     githubWebhookSecret: 'test-webhook-secret',
     jwtSecret: 'test-jwt-secret-with-at-least-32-characters',
     tokenEncryptionKey: randomBytes(32),
+    anthropicApiKey: 'test-anthropic-key',
   });
 }

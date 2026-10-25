@@ -22,7 +22,7 @@ From the repository root, run `rush install` to install every project's dependen
 
 ## Execution
 
-Start ngrok with `ngrok http 3000` and keep the `https://…` address it prints. Copy `.env.example` to `.env` and fill it in: `PUBLIC_URL` with that ngrok address, the OAuth App's client id and secret, and the three secrets, each a random value of at least 32 characters from a password generator such as [1Password's](https://1password.com/password-generator).
+Start ngrok with `ngrok http 3000` and keep the `https://…` address it prints. Copy `.env.example` to `.env` and fill it in: `PUBLIC_URL` with that ngrok address, the OAuth App's client id and secret, and the three secrets, each a random value of at least 32 characters from a password generator such as [1Password's](https://1password.com/password-generator). `ANTHROPIC_API_KEY` is optional: it enables the Copilot, and without it everything else works.
 
 Then start MongoDB with `docker compose up -d mongodb`. It listens on port 27117, so it doesn't clash with a MongoDB you may already run on the default port. Then start the API with `rushx start:dev` from `backend/` and the web app with `rushx start` from `frontend/`, and open `http://localhost:4200`. The web app forwards `/api` to the API.
 
@@ -33,6 +33,7 @@ ngrok only matters for webhooks: turning a workflow on registers a webhook on it
 ## Architectural decisions
 
 - **Rush monorepo with pnpm**: the backend and the frontend share common definitions, like the Zod schemas and the app catalog, so I needed a monorepo. Rush is the monorepo tool I've used for 7 years to share this kind of definitions easily.
+- **Copilot drafts, it never saves**: a sentence like "When a pull request is opened, comment thanks" goes to Claude with the app catalog and my repositories, and comes back as a draft through structured outputs. The draft opens in the builder, so I review it, save it, and turn it on like any other workflow.
 - **MongoDB driver with Zod**: I chose the official MongoDB driver over Mongoose. Zod already describes every entity, so a Mongoose schema would just repeat it. Every write is parsed with Zod before it reaches the database.
 - **UUIDs as `_id`**: every id is a UUID from `crypto.randomUUID()`, set explicitly on insert. I use `_id` as is in the database, the API and the frontend, so there's no ObjectId and no mapping to `id`.
 - **Soft deletes for workflows**: deleting a workflow sets `deletedAt` instead of removing it, so the events it received can still point back to it. Its GitHub webhook is removed anyway.

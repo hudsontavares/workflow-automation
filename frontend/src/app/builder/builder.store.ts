@@ -12,6 +12,7 @@ import {
   type TriggerType,
   type UpdateWorkflowConfigurationInput,
   type WorkflowConfiguration,
+  type WorkflowDraft,
 } from '@workflow-automation/shared';
 
 const samplePullRequestData = {
@@ -70,6 +71,14 @@ export class BuilderStore {
     this.connectionId.set(workflow.trigger.connectionId);
     this.repository.set(workflow.trigger.repository);
     this.body.set(workflow.action.body);
+  }
+
+  loadDraft(draft: WorkflowDraft): void {
+    this.name.set(draft.name);
+    this.triggerType.set(draft.triggerType);
+    this.actionType.set(draft.actionType);
+    this.repository.set(draft.repository);
+    this.body.set(draft.body);
   }
 
   toCreateInput(): CreateWorkflowConfigurationInput {

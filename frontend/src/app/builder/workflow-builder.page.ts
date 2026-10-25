@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { apiErrorMessage } from '../api/api-error-message';
 import { WorkflowsApi } from '../api/workflows.api';
+import { CopilotDraftStore } from '../copilot/copilot-draft.store';
 import { SessionStore } from '../core/session.store';
 import { ActionStep } from './action-step';
 import { BuilderStore } from './builder.store';
@@ -19,6 +20,11 @@ import { WorkflowRuns } from './workflow-runs';
       {{ workflowId() ? 'Edit workflow' : 'New workflow' }}
     </h1>
 
+    @if (fromCopilot()) {
+      <p class="mb-4 rounded-md bg-sky-50 p-3 text-sm text-sky-900" data-testid="copilot-notice">
+        Drafted by the Copilot. Review every step, then save.
+      </p>
+    }
     @if (loadError()) {
       <p role="alert" class="text-rose-700">{{ loadError() }}</p>
     } @else {
@@ -81,17 +87,24 @@ export class WorkflowBuilderPage implements OnInit {
 
   protected readonly store = inject(BuilderStore);
   private readonly session = inject(SessionStore);
+  private readonly copilotDrafts = inject(CopilotDraftStore);
   private readonly workflowsApi = inject(WorkflowsApi);
   private readonly router = inject(Router);
 
   protected readonly saving = signal(false);
   protected readonly saveError = signal<string | null>(null);
   protected readonly loadError = signal<string | null>(null);
+  protected readonly fromCopilot = signal(false);
 
   async ngOnInit(): Promise<void> {
     const workflowId = this.workflowId();
     if (!workflowId) {
       this.store.connectionId.set(this.session.githubConnectionId());
+      const draft = this.copilotDrafts.take();
+      if (draft) {
+        this.store.loadDraft(draft);
+        this.fromCopilot.set(true);
+      }
       return;
     }
     try {

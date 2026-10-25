@@ -15,7 +15,7 @@ describe('Workflows API', () => {
 
   beforeAll(async () => {
     database = await startTestDatabase();
-    app = await createTestApp(database, githubClient);
+    app = await createTestApp(database, { githubClient });
   });
 
   afterAll(async () => {

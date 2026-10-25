@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module.js';
 import { ConfigModule } from './config/config.module.js';
 import { ConnectionsModule } from './connections/connections.module.js';
+import { CopilotModule } from './copilot/copilot.module.js';
 import { DatabaseModule } from './database/database.module.js';
 import { HealthModule } from './health/health.module.js';
 import { WebhooksModule } from './webhooks/webhooks.module.js';
@@ -17,6 +18,7 @@ import { WorkflowsModule } from './workflows/workflows.module.js';
     ConnectionsModule,
     WorkflowsModule,
     WebhooksModule,
+    CopilotModule,
   ],
 })
 export class AppModule {}

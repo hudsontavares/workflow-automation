@@ -1,5 +1,6 @@
 export * from './actions.js';
 export * from './catalog.js';
+export * from './copilot.js';
 export * from './workflow-event.js';
 export * from './github.js';
 export * from './serialized.js';
