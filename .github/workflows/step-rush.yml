@@ -1,0 +1,57 @@
+name: Step - Rush
+
+on:
+  workflow_call:
+    inputs:
+      step:
+        description: 'The Rush command to run, or none to only install'
+        required: true
+        type: string
+      build:
+        description: 'If set, runs rush build with these arguments before the step'
+        type: string
+        default: ''
+
+jobs:
+  step-rush:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v7
+
+      - name: use the node version from .nvmrc
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: restore packages (rush)
+        uses: actions/cache@v6
+        with:
+          path: |
+            common/temp
+          key: rush-cache-${{ hashFiles('rush.json', '**/pnpm-lock.yaml') }}
+
+      - name: install dependencies
+        run: |
+          node common/scripts/install-run-rush.js install
+
+      - name: build projects
+        if: inputs.build != ''
+        run: |
+          node common/scripts/install-run-rush.js build ${{ inputs.build }}
+        env:
+          NODE_ENV: development
+
+      - name: ${{ inputs.step }}
+        if: inputs.step != 'none'
+        run: |
+          node common/scripts/install-run-rush.js ${{ inputs.step }}
+        env:
+          CI: true
+          NODE_ENV: development
+
+      - name: keep only the reusable parts of the cache
+        if: always()
+        run: |
+          rm -rf $(find common/temp/* -maxdepth 1 | grep -v pnpm-store | grep -v install-run)

@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  install:
+    uses: ./.github/workflows/step-rush.yml
+    with:
+      step: none
+
+  build:
+    uses: ./.github/workflows/step-rush.yml
+    needs: [install]
+    with:
+      step: build
+
+  lint:
+    uses: ./.github/workflows/step-rush.yml
+    needs: [install]
+    with:
+      step: lint
+
+  check-format:
+    uses: ./.github/workflows/step-rush.yml
+    needs: [install]
+    with:
+      step: check-format
+
+  test:
+    uses: ./.github/workflows/step-rush.yml
+    needs: [install]
+    with:
+      # The backend and frontend tests import the built shared package.
+      build: --to @workflow-automation/shared
+      step: test
